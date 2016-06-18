@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>OHG JUMBOTRON DISPLAY REMOTE</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>
+				<iframe src="../client" frameborder="1" width="672" height="504" style="display: block; margin: 0 auto;"></iframe>
+				<h4>KEINE BILDSCHIRMÜBERTRAGUNG - IMMER MIT REALEM BILD ÜBERPRÜFEN!</h4>
+			</td>
+			<td style="padding-left: 25px;">
+				<h1>JUMBO-CONTROL - Laurenz Grote</h1>
+				<div id="motd">
+					<h2>MOTD</h2>
+					<form action="">
+						<input type="text" id="motdm">
+						<input type="submit" value="GO!">
+					</form>
+				</div>
+				<div id="content">
+					<h2>Content</h2>
+					<div id="flushscreen">
+						<h3>Bildschirm leeren</h3>
+						<form action=""><input type="submit" value="GO!"></form>
+					</div>
+					<div id="standbild">
+						<h3>Standbild laden</h3>
+						<form action=""><input type="text" id="standbildm"><input type="submit" value="GO!"></form>
+					</div>
+					<div id="video">
+						<h3>Video laden</h3>
+						<form action=""><input type="text" id="videom"><input type="submit" value="GO!"></form>
+					</div>
+					<div id="slideshow">
+						<h3>Slideshow laden</h3>
+						<form action="" style="display: inline-block; margin-right: 55px;"><input type="text" id="slideshowm"><input type="submit" value="GO!"></form>
+						<button id="zurueck"><-</button><span style="margin-left: 20px;"></span><button id="vor">-></button>
+					</div>
+				</div>
+				<div id="events">
+					<h2>Events</h2>
+					<form action="">
+						<table>
+							<tr>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+							</tr>
+							<tr>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+							</tr>
+							<tr>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+								<td><input type="text" class="eventcontent"></td>
+							</tr>
+						</table>
+						<input type="submit" value="GO!">
+					</form>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="jquery.min.js"></script>
+    <script>
+      var socket = io();
+      $('#motd').submit(function(){
+      	var newmotd = $('#motdm').val();
+      	if (confirm(newmotd)) socket.emit('chat message', "0x1|" + newmotd);
+        return false;
+      });
+      $('#events').submit(function(){
+      	var derbestestringderwelt = "";
+      	$(".eventcontent").each(function (index, value){
+      		derbestestringderwelt = derbestestringderwelt + $(this).val() + "~";
+      	});
+        if (confirm(derbestestringderwelt)) socket.emit('chat message', "0x2|" + derbestestringderwelt);
+        return false;
+      });
+      $('#flushscreen').submit(function(){
+      	if (confirm("Inhalt löschen?")) socket.emit('chat message', "0x3| ");
+        return false;
+      });
+      $('#standbild').submit(function(){
+      	var newurl = $('#standbildm').val();
+      	if (confirm(newurl)) socket.emit('chat message', "0x4|" + newurl);
+        return false;
+      });
+      $('#video').submit(function(){
+      	var newurl = $('#videom').val();
+      	if (confirm(newurl)) socket.emit('chat message', "0x5|" + newurl);
+        return false;
+      });
+      $('#slideshow').submit(function(){
+      	var newurl = $('#slideshowm').val();
+      	if (confirm(newurl)) socket.emit('chat message', "0x6|" + newurl);
+        return false;
+      });
+      $('#vor').click(function() {
+      	socket.emit('chat message', "0x71|");
+      });
+      $('#zurueck').click(function() {
+      	socket.emit('chat message', "0x72|");
+      });
+    </script>
+</body>
+</html>

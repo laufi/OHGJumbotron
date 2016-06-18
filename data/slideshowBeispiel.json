@@ -1,0 +1,22 @@
+{
+  "mode": "click",
+  "delay" : 5000,
+  "slides": [
+    {
+      "type": "img",
+      "url": "demo1/out-0.png"
+    },
+    {
+      "type": "img",
+      "url": "demo1/out-1.png"
+    },
+    {
+      "type": "video",
+      "url": "demo2/bbb.mp4"
+    },
+    {
+      "type": "img",
+      "url": "demo1/out-2.png"
+    }
+  ]
+}

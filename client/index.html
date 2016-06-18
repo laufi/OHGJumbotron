@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>OHG JUMBOTRON DISPLAY CLIENT</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<script>
+		function startTime() {
+		    var today = new Date();
+		    var h = today.getHours();
+		    var m = today.getMinutes();
+		    m = checkTime(m);
+		    document.getElementById('clock').innerHTML =
+		    h + ":" + m;
+		    var t = setTimeout(startTime, 500);
+		}
+		function checkTime(i) {
+		    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+		    return i;
+		}
+	</script>
+</head>
+<body onload="startTime()">
+	<div id="jumbotron">
+		<div id="top">
+			<span id="textoben">MOTD</span>
+			<span id="clock">CLK</span>
+		</div>
+		<div id="middle">
+		</div>
+		<div id="bottom" class="row">
+			<img src="logo.png" id="logo" />
+			<div id="eventreel">
+				<ul>
+					<li><span class="time">TIME</span><span class="title">TITLE</span><span class="location">LOC</span></li>
+					<li><span class="time">TIME</span><span class="title">TITLE</span><span class="location">LOC</span></li>
+					<li><span class="time">TIME</span><span class="title">TITLE</span><span class="location">LOC</span></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="jquery.min.js"></script>
+    <script>
+      var timeout;
+      var inPresentation = false;
+      var presentation;
+      var presentationPos = 0;
+      var socket = io();
+      socket.on('chat message', function(msg){
+        var splittedmsg = msg.split("|");
+        switch (splittedmsg[0]) {
+        	case "0x1":
+        		$("#textoben").html(splittedmsg[1]);
+        		break;
+        	case "0x2":
+        		var eventdetails = splittedmsg[1].split("~")
+        		$("#eventreel span").each(function (index, value){
+        			$(this).html(eventdetails[index]);
+        		});
+        		break;
+        	case "0x3":
+            setContent("");
+        		break;
+        	case "0x4":
+        		setContent("<img src='../data/" + splittedmsg[1] + "'>");
+        		break;
+        	case "0x5":
+        		setContent("<video src='../data/" + splittedmsg[1] + "' autoplay>");
+        	 break;
+        	case "0x6":
+        		$.getJSON("../data/" + splittedmsg[1], function (data) {
+        			var mode = data.mode;
+        			console.log("Slideshow mode: " + mode);
+        			if (mode == "auto") {
+        				var i = 0;
+        				var slidesNumber = data.slides.length;
+        				displayElement(data.slides[i]);
+						    i = i + 1;
+        				if (i == slidesNumber) i = 0;
+        				timeout = setInterval(function () {
+        					displayElement(data.slides[i]);
+        					i = i + 1;
+        					if (i == slidesNumber) i = 0;
+        				}, data.delay);
+        			} else {
+                // Dann isset ja click
+                inPresentation = true;
+                presentationPos = 0;
+                presentation = data.slides;
+                displayElement(presentation[0]);
+              }
+        		});
+            break;
+          case "0x71":
+            if (inPresentation && presentationPos + 1 < presentation.length) {
+              presentationPos++;
+              displayElement(presentation[presentationPos]);
+            }
+            break;
+            case "0x72":
+            if (inPresentation && presentationPos - 1 > -1) {
+              presentationPos--;
+              displayElement(presentation[presentationPos]);
+            }
+            break;
+        }  
+      });
+      function displayElement(element) {
+      	if (element.type == "img") {
+      		$("#middle").html("<img src='../data/" + element.url + "'>");
+      	} else if (element.type == "video") {
+      		$("#middle").html("<video src='../data/" + element.url + "' autoplay>");
+      	}
+      };
+      function setContent(content) {
+        $("#middle").html(content);
+        clearInterval(timeout);
+        inPresentation = false;
+      }
+    </script>
+</body>
+</html>
